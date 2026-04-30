@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clip Review — 2026-04-29</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f5f5f7; color: #1d1d1f; padding: 28px 20px;
+      font-size: 15px; line-height: 1.5;
+    }
+    .page-header {
+      max-width: 980px; margin: 0 auto 24px;
+      padding-bottom: 16px; border-bottom: 1px solid #d1d1d6;
+    }
+    .page-header h1 { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+    .page-header .sermon-title { color: #6e6e73; font-size: 14px; margin-bottom: 12px; }
+    .page-header .instructions {
+      font-size: 14px; color: #3a3a3c; line-height: 1.55;
+      background: #fff; border: 1px solid #e5e5ea; border-radius: 10px;
+      padding: 12px 16px;
+    }
+
+    .top-controls {
+      max-width: 980px; margin: 0 auto 20px;
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .btn-download-all {
+      background: #1d1d1f; color: #fff; border: none;
+      padding: 10px 18px; border-radius: 8px; font-size: 14px;
+      font-weight: 500; cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-download-all:hover { background: #3a3a3c; }
+
+    .overall-card {
+      max-width: 980px; margin: 0 auto 28px;
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 18px 20px;
+    }
+    .overall-card h2 { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+    .overall-card .hint { font-size: 12px; color: #8e8e93; margin-bottom: 8px; }
+    .overall-card textarea {
+      width: 100%; min-height: 80px;
+      border: 1px solid #d1d1d6; border-radius: 8px;
+      padding: 10px 12px; font-size: 14px; font-family: inherit;
+      resize: vertical;
+    }
+    .overall-card textarea:focus {
+      outline: none; border-color: #007aff;
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
+    }
+
+    .clip-card {
+      max-width: 980px; margin: 0 auto 28px;
+      background: #fff; border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden;
+    }
+    .clip-header {
+      padding: 14px 20px; border-bottom: 1px solid #f0f0f2;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .clip-num {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+      background: #1d1d1f; color: #fff;
+      border-radius: 5px; padding: 3px 8px; white-space: nowrap;
+    }
+    .clip-title { font-size: 15px; font-weight: 600; flex: 1; min-width: 150px; }
+    .btn-download-clip {
+      font-size: 12px; padding: 6px 12px; border-radius: 6px;
+      background: #f5f5f7; border: 1px solid #d1d1d6; color: #1d1d1f;
+      cursor: pointer; text-decoration: none; white-space: nowrap;
+    }
+    .btn-download-clip:hover { background: #e5e5ea; }
+
+    .clip-body { padding: 18px; display: grid; gap: 18px;
+                 grid-template-columns: minmax(260px, 1.2fr) minmax(280px, 1fr); }
+    @media (max-width: 760px) {
+      .clip-body { grid-template-columns: 1fr; }
+    }
+
+    .video-wrap { position: relative; padding-top: 56.25%; border-radius: 10px;
+                  overflow: hidden; background: #000; }
+    .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%;
+                          border: 0; }
+    .video-meta { font-size: 11px; color: #8e8e93; margin-top: 6px; }
+
+    .feedback-col { display: flex; flex-direction: column; gap: 16px; }
+    .feedback-section {
+      background: #fafafa; border: 1px solid #f0f0f2;
+      border-radius: 10px; padding: 12px 14px;
+    }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; color: #8e8e93; margin-bottom: 8px;
+    }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .pill {
+      font-size: 12px; padding: 5px 12px; border-radius: 16px;
+      border: 1px solid #d1d1d6; background: #fff; color: #3a3a3c;
+      cursor: pointer; transition: all 0.12s; user-select: none;
+    }
+    .pill:hover { background: #f0f0f2; }
+    .pill.active-yes      { background: #d4edda; border-color: #34c759; color: #1a5c2a; font-weight: 600; }
+    .pill.active-no       { background: #f8d7da; border-color: #ff3b30; color: #842029; font-weight: 600; }
+    .pill.active-recut    { background: #fff3cd; border-color: #ff9500; color: #663c00; font-weight: 600; }
+    .pill.active-approved { background: #d4edda; border-color: #34c759; color: #1a5c2a; font-weight: 600; }
+    .pill.active-flagged  { background: #fff3cd; border-color: #ff9500; color: #663c00; font-weight: 600; }
+
+    .feedback-input {
+      width: 100%; min-height: 60px;
+      border: 1px solid #d1d1d6; border-radius: 8px;
+      padding: 8px 10px; font-size: 13px; font-family: inherit;
+      resize: vertical; background: #fff;
+    }
+    .feedback-input:focus {
+      outline: none; border-color: #007aff;
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
+    }
+
+    details.transcript-details { margin-top: 8px; }
+    details.transcript-details summary {
+      font-size: 12px; color: #6e6e73; cursor: pointer;
+      list-style: none; user-select: none;
+    }
+    details.transcript-details summary::-webkit-details-marker { display: none; }
+    details.transcript-details summary::before { content: "▸ "; }
+    details.transcript-details[open] summary::before { content: "▾ "; }
+    .transcript-body {
+      font-size: 12px; line-height: 1.7; color: #3a3a3c;
+      max-height: 180px; overflow-y: auto;
+      border: 1px solid #f0f0f2; border-radius: 6px;
+      padding: 8px 10px; background: #fff; margin-top: 6px;
+    }
+
+    .footer {
+      max-width: 980px; margin: 0 auto 60px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .submit-btn {
+      background: #007aff; color: #fff; border: none;
+      padding: 12px 24px; border-radius: 10px; font-size: 15px;
+      font-weight: 500; cursor: pointer; transition: background 0.15s;
+    }
+    .submit-btn:hover { background: #0a5fc7; }
+    .submit-btn:disabled { background: #a4c8ff; cursor: not-allowed; }
+    .progress-note { font-size: 13px; color: #6e6e73; }
+    .progress-count { font-weight: 600; color: #1d1d1f; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1d1d1f; color: #fff; padding: 12px 20px;
+      border-radius: 10px; font-size: 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .toast.show { opacity: 1; }
+    .toast.error { background: #b00020; }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1>Clip Review — Wednesday, April 29, 2026</h1>
+    <p class="sermon-title">Science of Happiness ｜ Week 3</p>
+    <div class="instructions">
+      Watch each clip below. For each one, tell Cleo:
+      <strong>(1) was this the right moment to clip?</strong> and
+      <strong>(2) do the captions / framing look right?</strong>
+      Add big-picture notes at the top if there's a pattern she should watch for.
+      When you're done, click <strong>Submit Feedback</strong>. You can download
+      individual clips or all of them at any time.
+    </div>
+  </div>
+
+  <div class="top-controls">
+    <a class="btn-download-all" href="https://drive.google.com/drive/folders/1nTYrb3hKikOoFKLtErh23viTd17y5-c6" target="_blank" rel="noopener">
+      ⬇ Download all clips (Drive folder)
+    </a>
+  </div>
+
+  <div class="overall-card">
+    <h2>Big-picture notes for next week</h2>
+    <p class="hint">Patterns, tone shifts, what to look for in future sermons. Optional.</p>
+    <textarea id="overall-notes"
+      placeholder="e.g. 'More humor next time' or 'These three were too back-to-back serious'"></textarea>
+  </div>
+
+  <div class="clip-card" id="card-0">
+    <div class="clip-header">
+      <span class="clip-num">Clip 1</span>
+      <h2 class="clip-title">The Soulless Disney Factory</h2>
+      <a class="btn-download-clip" href="https://drive.google.com/uc?export=download&amp;id=1pE7Cww3PcFbqJvQLsTEmytpflWpshl-Y" target="_blank" rel="noopener">⬇ Download</a>
+    </div>
+    <div class="clip-body">
+      <div>
+        <div class="video-wrap">
+          <iframe src="https://drive.google.com/file/d/1pE7Cww3PcFbqJvQLsTEmytpflWpshl-Y/preview" allowfullscreen></iframe>
+        </div>
+        <p class="video-meta">clip01-the-soulless-disney-factory-captioned.mp4</p>
+        <details class="transcript-details">
+          <summary>Show transcript</summary>
+          <div class="transcript-body">You will never get anywhere near Disneyland because these people are not Disneyland people. You just work in the factory.</div>
+        </details>
+      </div>
+      <div class="feedback-col">
+        <div class="feedback-section">
+          <div class="section-label">Selection — was this the right moment?</div>
+          <div class="pill-row">
+            <span class="pill pill-selection" data-value="yes"   onclick="setSelection(0,'yes')">✓ Yes</span>
+            <span class="pill pill-selection" data-value="no"    onclick="setSelection(0,'no')">✗ No, skip it</span>
+            <span class="pill pill-selection" data-value="recut" onclick="setSelection(0,'recut')">⚲ Different cut</span>
+          </div>
+          <textarea class="feedback-input input-selection"
+            placeholder="If 'No' or 'Different cut': what would have been better? Earlier? Later? A different quote?"></textarea>
+        </div>
+        <div class="feedback-section">
+          <div class="section-label">Aesthetics — captions, framing, wording</div>
+          <div class="pill-row">
+            <span class="pill pill-aesthetics" data-value="approved" onclick="setAesthetics(0,'approved')">✓ Looks good</span>
+            <span class="pill pill-aesthetics" data-value="flagged"  onclick="setAesthetics(0,'flagged')">⚠ Needs changes</span>
+          </div>
+          <textarea class="feedback-input input-aesthetics"
+            placeholder="Caption wording, placement, font size, framing — anything visual."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="clip-card" id="card-1">
+    <div class="clip-header">
+      <span class="clip-num">Clip 2</span>
+      <h2 class="clip-title">Mickey Mouse You Suck</h2>
+      <a class="btn-download-clip" href="https://drive.google.com/uc?export=download&amp;id=13WfeFjsVwdc1xsU26hoTFuSQR8K7s8WB" target="_blank" rel="noopener">⬇ Download</a>
+    </div>
+    <div class="clip-body">
+      <div>
+        <div class="video-wrap">
+          <iframe src="https://drive.google.com/file/d/13WfeFjsVwdc1xsU26hoTFuSQR8K7s8WB/preview" allowfullscreen></iframe>
+        </div>
+        <p class="video-meta">clip02-mickey-mouse-you-suck-captioned.mp4</p>
+        <details class="transcript-details">
+          <summary>Show transcript</summary>
+          <div class="transcript-body">Even in a job that does not align with your values, you could still honor Jesus some way there.</div>
+        </details>
+      </div>
+      <div class="feedback-col">
+        <div class="feedback-section">
+          <div class="section-label">Selection — was this the right moment?</div>
+          <div class="pill-row">
+            <span class="pill pill-selection" data-value="yes"   onclick="setSelection(1,'yes')">✓ Yes</span>
+            <span class="pill pill-selection" data-value="no"    onclick="setSelection(1,'no')">✗ No, skip it</span>
+            <span class="pill pill-selection" data-value="recut" onclick="setSelection(1,'recut')">⚲ Different cut</span>
+          </div>
+          <textarea class="feedback-input input-selection"
+            placeholder="If 'No' or 'Different cut': what would have been better? Earlier? Later? A different quote?"></textarea>
+        </div>
+        <div class="feedback-section">
+          <div class="section-label">Aesthetics — captions, framing, wording</div>
+          <div class="pill-row">
+            <span class="pill pill-aesthetics" data-value="approved" onclick="setAesthetics(1,'approved')">✓ Looks good</span>
+            <span class="pill pill-aesthetics" data-value="flagged"  onclick="setAesthetics(1,'flagged')">⚠ Needs changes</span>
+          </div>
+          <textarea class="feedback-input input-aesthetics"
+            placeholder="Caption wording, placement, font size, framing — anything visual."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="clip-card" id="card-2">
+    <div class="clip-header">
+      <span class="clip-num">Clip 3</span>
+      <h2 class="clip-title">God Was Still There</h2>
+      <a class="btn-download-clip" href="https://drive.google.com/uc?export=download&amp;id=10tgqDNiMFMoHrgvMlIzJ0xPwYobbiU0a" target="_blank" rel="noopener">⬇ Download</a>
+    </div>
+    <div class="clip-body">
+      <div>
+        <div class="video-wrap">
+          <iframe src="https://drive.google.com/file/d/10tgqDNiMFMoHrgvMlIzJ0xPwYobbiU0a/preview" allowfullscreen></iframe>
+        </div>
+        <p class="video-meta">clip03-god-was-still-there-captioned.mp4</p>
+        <details class="transcript-details">
+          <summary>Show transcript</summary>
+          <div class="transcript-body">Maybe it didn&#39;t happen for a reason. Maybe it was completely random and you cannot force yourself to believe that it happened for a reason. But God used it anyway.</div>
+        </details>
+      </div>
+      <div class="feedback-col">
+        <div class="feedback-section">
+          <div class="section-label">Selection — was this the right moment?</div>
+          <div class="pill-row">
+            <span class="pill pill-selection" data-value="yes"   onclick="setSelection(2,'yes')">✓ Yes</span>
+            <span class="pill pill-selection" data-value="no"    onclick="setSelection(2,'no')">✗ No, skip it</span>
+            <span class="pill pill-selection" data-value="recut" onclick="setSelection(2,'recut')">⚲ Different cut</span>
+          </div>
+          <textarea class="feedback-input input-selection"
+            placeholder="If 'No' or 'Different cut': what would have been better? Earlier? Later? A different quote?"></textarea>
+        </div>
+        <div class="feedback-section">
+          <div class="section-label">Aesthetics — captions, framing, wording</div>
+          <div class="pill-row">
+            <span class="pill pill-aesthetics" data-value="approved" onclick="setAesthetics(2,'approved')">✓ Looks good</span>
+            <span class="pill pill-aesthetics" data-value="flagged"  onclick="setAesthetics(2,'flagged')">⚠ Needs changes</span>
+          </div>
+          <textarea class="feedback-input input-aesthetics"
+            placeholder="Caption wording, placement, font size, framing — anything visual."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="clip-card" id="card-3">
+    <div class="clip-header">
+      <span class="clip-num">Clip 4</span>
+      <h2 class="clip-title">Third of Your Life Disoriented</h2>
+      <a class="btn-download-clip" href="https://drive.google.com/uc?export=download&amp;id=1xysq1tntW1bgOMcexAqmAP3bfV1loVXI" target="_blank" rel="noopener">⬇ Download</a>
+    </div>
+    <div class="clip-body">
+      <div>
+        <div class="video-wrap">
+          <iframe src="https://drive.google.com/file/d/1xysq1tntW1bgOMcexAqmAP3bfV1loVXI/preview" allowfullscreen></iframe>
+        </div>
+        <p class="video-meta">clip04-third-of-your-life-disoriented-captioned.mp4</p>
+        <details class="transcript-details">
+          <summary>Show transcript</summary>
+          <div class="transcript-body">A full third of the Psalms validate that you spend like a third of your life feeling painfully disoriented. It is the normal course of things — and God is in that too.</div>
+        </details>
+      </div>
+      <div class="feedback-col">
+        <div class="feedback-section">
+          <div class="section-label">Selection — was this the right moment?</div>
+          <div class="pill-row">
+            <span class="pill pill-selection" data-value="yes"   onclick="setSelection(3,'yes')">✓ Yes</span>
+            <span class="pill pill-selection" data-value="no"    onclick="setSelection(3,'no')">✗ No, skip it</span>
+            <span class="pill pill-selection" data-value="recut" onclick="setSelection(3,'recut')">⚲ Different cut</span>
+          </div>
+          <textarea class="feedback-input input-selection"
+            placeholder="If 'No' or 'Different cut': what would have been better? Earlier? Later? A different quote?"></textarea>
+        </div>
+        <div class="feedback-section">
+          <div class="section-label">Aesthetics — captions, framing, wording</div>
+          <div class="pill-row">
+            <span class="pill pill-aesthetics" data-value="approved" onclick="setAesthetics(3,'approved')">✓ Looks good</span>
+            <span class="pill pill-aesthetics" data-value="flagged"  onclick="setAesthetics(3,'flagged')">⚠ Needs changes</span>
+          </div>
+          <textarea class="feedback-input input-aesthetics"
+            placeholder="Caption wording, placement, font size, framing — anything visual."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="footer">
+    <button type="button" class="submit-btn" id="submit-btn" onclick="submitFeedback()">
+      Submit Feedback
+    </button>
+    <span class="progress-note">
+      <span class="progress-count" id="reviewed-count">0</span> of 4 clips reviewed
+    </span>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var FORMSPREE_URL = "https://formspree.io/f/xeenjbdq";
+    var META = {"date": "2026-04-29", "sermon_title": "Science of Happiness \uff5c Week 3", "clips": [{"title": "The Soulless Disney Factory", "filename": "clip01-the-soulless-disney-factory-captioned.mp4"}, {"title": "Mickey Mouse You Suck", "filename": "clip02-mickey-mouse-you-suck-captioned.mp4"}, {"title": "God Was Still There", "filename": "clip03-god-was-still-there-captioned.mp4"}, {"title": "Third of Your Life Disoriented", "filename": "clip04-third-of-your-life-disoriented-captioned.mp4"}]};
+    var TOTAL = 4;
+
+    // statuses[i] = { selection: 'yes'|'no'|'recut'|null,
+    //                  aesthetics: 'approved'|'flagged'|null }
+    var statuses = {};
+    for (var i = 0; i < TOTAL; i++) statuses[i] = { selection: null, aesthetics: null };
+
+    function setSelection(idx, value) {
+      statuses[idx].selection = value;
+      var card = document.getElementById('card-' + idx);
+      var pills = card.querySelectorAll('.pill-selection');
+      pills.forEach(function(p) {
+        p.classList.remove('active-yes', 'active-no', 'active-recut');
+        if (p.dataset.value === value) {
+          p.classList.add('active-' + value);
+        }
+      });
+      updateProgress();
+    }
+
+    function setAesthetics(idx, value) {
+      statuses[idx].aesthetics = value;
+      var card = document.getElementById('card-' + idx);
+      var pills = card.querySelectorAll('.pill-aesthetics');
+      pills.forEach(function(p) {
+        p.classList.remove('active-approved', 'active-flagged');
+        if (p.dataset.value === value) {
+          p.classList.add('active-' + value);
+        }
+      });
+      updateProgress();
+    }
+
+    function isReviewed(s) {
+      return s.selection !== null || s.aesthetics !== null;
+    }
+
+    function updateProgress() {
+      var n = 0;
+      for (var i = 0; i < TOTAL; i++) {
+        if (isReviewed(statuses[i])) n++;
+      }
+      document.getElementById('reviewed-count').textContent = n;
+    }
+
+    function showToast(msg, isError) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.toggle('error', !!isError);
+      t.classList.add('show');
+      setTimeout(function() { t.classList.remove('show'); }, 4500);
+    }
+
+    function collectFeedback() {
+      var clips = [];
+      for (var i = 0; i < TOTAL; i++) {
+        var card = document.getElementById('card-' + i);
+        clips.push({
+          clip_index: i,
+          title: META.clips[i].title,
+          selection: statuses[i].selection,
+          selection_notes: card.querySelector('.input-selection').value.trim(),
+          aesthetics: statuses[i].aesthetics,
+          aesthetics_notes: card.querySelector('.input-aesthetics').value.trim()
+        });
+      }
+      return {
+        date: META.date,
+        sermon_title: META.sermon_title,
+        reviewed_at: new Date().toISOString(),
+        overall_notes: document.getElementById('overall-notes').value.trim(),
+        clips: clips,
+        summary: {
+          total: TOTAL,
+          reviewed: clips.filter(function(c) {
+            return c.selection || c.aesthetics || c.selection_notes || c.aesthetics_notes;
+          }).length
+        }
+      };
+    }
+
+    function submitFeedback() {
+      var btn = document.getElementById('submit-btn');
+      var payload = collectFeedback();
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(res) {
+        if (res.ok) {
+          showToast('✓ Feedback sent to Cleo. Thanks!');
+          btn.textContent = 'Submitted ✓';
+        } else {
+          showToast('Submission failed (' + res.status + '). Try again or copy your feedback.', true);
+          btn.disabled = false;
+          btn.textContent = 'Submit Feedback';
+        }
+      }).catch(function(err) {
+        showToast('Network error — your feedback wasn\'t sent.', true);
+        btn.disabled = false;
+        btn.textContent = 'Submit Feedback';
+      });
+    }
+  </script>
+</body>
+</html>
